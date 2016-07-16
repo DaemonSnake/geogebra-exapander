@@ -1,6 +1,6 @@
 # geogebra-exapander
 A python3 script for Linux/MinGw that expand all the functions of a Geogebra file in a .c file.</br>
-It does so by using the C preprocessor.
+It does so by using the C preprocessor. (it doesn't translate to c, it simply expoits the C preprocessor)</br>
 </br>
 This script requires cpp (gcc) and python3.</br>
 The linux and cpp dependency can be easily replaced with other system specific ones.</br>
