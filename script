@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+# Copyright (C) 2016  Bastien Penavayre
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+from zipfile import ZipFile
+from sys import argv as args
+from xml.etree.ElementTree import parse
+from subprocess import call
+
+def functionData(name, expr):
+  args = expr.strip(name).split('=')[0].rstrip(' ')
+  data = [name + args, expr[expr.find('=') + 1:].strip(' ')]
+  return data
+
+def getFunctions(name):
+  data = []
+  with ZipFile(name, 'r') as myzip:
+    with myzip.open('geogebra.xml') as xml_file:
+      root = parse(xml_file).getroot()
+      for x in root.iter('expression'):
+        data.append(functionData(x.attrib['label'], x.attrib['exp']))
+  return data
+
+def main(name):
+  data = getFunctions(name)
+  header_name = name[:name.rfind('.')]
+  compiled_name = header_name + '.c'
+  header_name += '.h'
+  with open(header_name, 'w') as fd:
+    for line in data:
+      print("#define " + line[0] + " (" + line[1] + ')', file=fd)
+    for line in data:
+      print("", file=fd)
+      print("\"Exanding function: " + line[0] + '"', file=fd)
+      print(line[0], file=fd)
+  call(["cpp", header_name, "-o", compiled_name]);
+      
+if __name__ == "__main__":
+  for name in args[1:]:
+    main(name)
