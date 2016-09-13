@@ -25,7 +25,7 @@ from xml.etree.ElementTree import parse
 from subprocess import call
 
 def functionData(name, expr):
-  if expr.find('=') == -1:
+  if expr.find('=') == -1 or expr.find(name) != 0:
     return [name, expr, True]
   args = expr.strip(name).split('=')[0].rstrip(' ')
   data = [name + args, expr[expr.find('=') + 1:].strip(' '), False]
