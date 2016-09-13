@@ -47,8 +47,7 @@ def main(name):
   header_name += '.h'
   with open(header_name, 'w') as fd:
     for line in data:
-      if not line[2]:
-        print("#define " + line[0] + " (" + line[1] + ')', file=fd)
+      print("#define " + line[0] + " (" + line[1] + ')', file=fd)
     for line in data:
       print("", file=fd)
       print("\"Exanding function: " + line[0] + '"', file=fd)
