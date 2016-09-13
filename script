@@ -25,8 +25,10 @@ from xml.etree.ElementTree import parse
 from subprocess import call
 
 def functionData(name, expr):
+  if expr.find('=') == -1:
+    return [name, expr, True]
   args = expr.strip(name).split('=')[0].rstrip(' ')
-  data = [name + args, expr[expr.find('=') + 1:].strip(' ')]
+  data = [name + args, expr[expr.find('=') + 1:].strip(' '), False]
   return data
 
 def getFunctions(name):
@@ -45,11 +47,12 @@ def main(name):
   header_name += '.h'
   with open(header_name, 'w') as fd:
     for line in data:
-      print("#define " + line[0] + " (" + line[1] + ')', file=fd)
+      if not line[2]:
+        print("#define " + line[0] + " (" + line[1] + ')', file=fd)
     for line in data:
       print("", file=fd)
       print("\"Exanding function: " + line[0] + '"', file=fd)
-      print(line[0], file=fd)
+      print(line[0] if not line[2] else line[1], file=fd)
   call(["cpp", header_name, "-o", compiled_name]);
       
 if __name__ == "__main__":
